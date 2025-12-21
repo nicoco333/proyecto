@@ -3,49 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Gastos</title>
+    <title>Student Wallet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="contenedor">
-        <h1>Rastreador de Gastos</h1>
+    <div class="main-container">
+        
+        <header>
+            <h1>🎓 Student Wallet <span class="mes-badge">{{ mes }}</span></h1>
+            
+            <div class="dashboard">
+                <div class="card ingreso">
+                    <h3>Ingresos</h3>
+                    <p>+ ${{ ingresos }}</p>
+                </div>
+                <div class="card saldo">
+                    <h3>Saldo Disponible</h3>
+                    <p>${{ saldo }}</p>
+                </div>
+                <div class="card gasto">
+                    <h3>Gastos</h3>
+                    <p>- ${{ gastos }}</p>
+                </div>
+            </div>
+        </header>
 
-        <form action="/agregar" method="POST">
-            <input type="text" name="descripcion" placeholder="¿En qué gastaste?" required>
-            <input type="number" step="0.01" name="monto" placeholder="Monto ($)" required>
-            <input type="text" name="categoria" placeholder="Categoría (Comida, Transporte...)" required>
-            <button type="submit">Agregar Gasto</button>
-        </form>
+        <div class="form-container">
+            <h2>Nueva Operación</h2>
+            <form action="/agregar" method="POST">
+                <div class="tipo-selector">
+                    <label>
+                        <input type="radio" name="tipo" value="gasto" checked> 
+                        <span class="btn-radio rojo">Gasto</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="tipo" value="ingreso"> 
+                        <span class="btn-radio verde">Ingreso</span>
+                    </label>
+                </div>
 
-        <hr>
+                <div class="inputs-row">
+                    <input type="text" name="descripcion" placeholder="Descripción (ej. Fotocopias)" required>
+                    <input type="number" step="0.01" name="monto" placeholder="Monto" required>
+                </div>
+                
+                <select name="categoria" required>
+                    <option value="" disabled selected>Categoría</option>
+                    <option value="Comida">Comida</option>
+                    <option value="Transporte">Transporte</option>
+                    <option value="Estudios">Estudios</option>
+                    <option value="Salidas">Salidas</option>
+                    <option value="Trabajo">Sueldo/Trabajo</option>
+                    <option value="Familia">Ayuda Familiar</option>
+                    <option value="Otro">Otro</option>
+                </select>
 
-        <h2>Historial</h2>
-<table>
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Descripción</th>
-                    <th>Categoría</th>
-                    <th>Monto</th>
-                    <th>Acción</th> </tr>
-            </thead>
-            <tbody>
-                {% for gasto in gastos %}
-                <tr>
-                    <td>{{ gasto.fecha.strftime('%d/%m/%Y') }}</td>
-                    <td>{{ gasto.descripcion }}</td>
-                    <td>{{ gasto.categoria }}</td>
-                    <td>${{ gasto.monto }}</td>
-                    <td>
-                        <a href="/delete/{{ gasto.id }}" style="color: red; text-decoration: none; font-weight: bold;">
-                            Borrar
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                <button type="submit" class="btn-add">Guardar</button>
+            </form>
+        </div>
+
+        <div class="lista-movimientos">
+            <h2>Movimientos del Mes</h2>
+            {% if transacciones|length == 0 %}
+                <p class="empty-msg">Aún no tienes movimientos este mes.</p>
+            {% else %}
+                <ul>
+                    {% for t in transacciones %}
+                    <li class="item-movimiento {{ t.tipo }}">
+                        <div class="info">
+                            <span class="cat">{{ t.categoria }}</span>
+                            <span class="desc">{{ t.descripcion }}</span>
+                            <span class="date">{{ t.fecha.strftime('%d/%m') }}</span>
+                        </div>
+                        <div class="monto-action">
+                            <span class="monto">
+                                {% if t.tipo == 'ingreso' %}+{% else %}-{% endif %} ${{ t.monto }}
+                            </span>
+                            <a href="/delete/{{ t.id }}" class="btn-delete"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
     </div>
 
 </body>

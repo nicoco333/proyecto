@@ -1,7 +1,45 @@
-body { font-family: sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; }
-.contenedor { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
-input { padding: 10px; margin: 5px 0; width: 95%; border: 1px solid #ddd; border-radius: 4px; }
-button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-button:hover { background-color: #218838; }
-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-th, td { border-bottom: 1px solid #ddd; padding: 10px; text-align: left; }
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+
+.main-container { max-width: 800px; margin: 0 auto; }
+
+/* Dashboard Cards */
+.dashboard { display: flex; gap: 10px; margin-top: 20px; text-align: center; }
+.card { flex: 1; padding: 15px; border-radius: 12px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.card.ingreso { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+.card.gasto { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+.card.saldo { background: linear-gradient(135deg, #3498db, #2980b9); transform: scale(1.05); } /* Destacamos el saldo */
+.card h3 { font-size: 0.9rem; margin: 0; opacity: 0.9; }
+.card p { font-size: 1.5rem; font-weight: bold; margin: 5px 0 0; }
+.mes-badge { background: #e0e0e0; color: #333; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; vertical-align: middle; }
+
+/* Formulario */
+.form-container { background: white; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.inputs-row { display: flex; gap: 10px; }
+input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; }
+.btn-add { width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+.btn-add:hover { background: #000; }
+
+/* Radio Buttons personalizados */
+.tipo-selector { display: flex; gap: 10px; margin-bottom: 10px; }
+.tipo-selector label { flex: 1; cursor: pointer; }
+.tipo-selector input { display: none; } /* Ocultamos el radio feo */
+.btn-radio { display: block; padding: 10px; text-align: center; border: 2px solid #ddd; border-radius: 8px; font-weight: 600; color: #aaa; transition: 0.2s; }
+input:checked + .btn-radio.rojo { background-color: #fceceb; border-color: #e74c3c; color: #e74c3c; }
+input:checked + .btn-radio.verde { background-color: #eafaf1; border-color: #2ecc71; color: #2ecc71; }
+
+/* Lista */
+.lista-movimientos ul { list-style: none; padding: 0; }
+.item-movimiento { background: white; padding: 15px; margin-bottom: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #ddd; }
+.item-movimiento.ingreso { border-left-color: #2ecc71; }
+.item-movimiento.gasto { border-left-color: #e74c3c; }
+.info { display: flex; flex-direction: column; }
+.info .cat { font-size: 0.8rem; color: #888; text-transform: uppercase; font-weight: bold; }
+.info .desc { font-weight: 600; }
+.monto-action { display: flex; align-items: center; gap: 15px; }
+.monto-action .monto { font-weight: bold; font-size: 1.1rem; }
+.item-movimiento.ingreso .monto { color: #2ecc71; }
+.item-movimiento.gasto .monto { color: #e74c3c; }
+.btn-delete { color: #ccc; transition: 0.2s; }
+.btn-delete:hover { color: #e74c3c; }
