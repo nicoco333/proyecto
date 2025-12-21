@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Gastos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="contenedor">
+        <h1>Rastreador de Gastos</h1>
+
+        <form action="/agregar" method="POST">
+            <input type="text" name="descripcion" placeholder="¿En qué gastaste?" required>
+            <input type="number" step="0.01" name="monto" placeholder="Monto ($)" required>
+            <input type="text" name="categoria" placeholder="Categoría (Comida, Transporte...)" required>
+            <button type="submit">Agregar Gasto</button>
+        </form>
+
+        <hr>
+
+        <h2>Historial</h2>
+<table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Descripción</th>
+                    <th>Categoría</th>
+                    <th>Monto</th>
+                    <th>Acción</th> </tr>
+            </thead>
+            <tbody>
+                {% for gasto in gastos %}
+                <tr>
+                    <td>{{ gasto.fecha.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ gasto.descripcion }}</td>
+                    <td>{{ gasto.categoria }}</td>
+                    <td>${{ gasto.monto }}</td>
+                    <td>
+                        <a href="/delete/{{ gasto.id }}" style="color: red; text-decoration: none; font-weight: bold;">
+                            Borrar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
