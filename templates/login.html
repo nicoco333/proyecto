@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    
+
     <style>
         body {
             display: flex;
             justify-content: center;
-            align-items: center;     
+            align-items: center;
             height: 100vh;
         }
     </style>
 </head>
+
 <body>
-    <div class="form-container" style="text-align: center; width: 100%; max-width: 400px;"> 
+    <div class="form-container" style="text-align: center; width: 100%; max-width: 400px;">
         <h2>Iniciar Sesión</h2>
+        {% if error %}
+        <div class="alert-error">
+            {{ error }}
+        </div>
+        {% endif %}
+        <form action="/login" method="POST">
             <form action="/login" method="POST">
                 <input type="text" name="username" placeholder="Usuario" required>
                 <input type="password" name="password" placeholder="Contraseña" required>
@@ -26,7 +34,8 @@
             <p style="margin-top: 25px;">
                 ¿No tienes cuenta? <a href="/register">Regístrate aquí</a>
             </p>
-        </div>
+    </div>
     </div>
 </body>
+
 </html>

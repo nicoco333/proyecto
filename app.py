@@ -50,7 +50,7 @@ def register():
         password = request.form['password']
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         if User.query.filter_by(username=username).first():
-            return "El usuario ya existe"
+            return render_template('register.html', error="Ese nombre de usuario ya está en uso.")
         nuevo_usuario = User(username=username, password=hashed_password)
         db.session.add(nuevo_usuario)
         db.session.commit()
@@ -65,7 +65,7 @@ def login():
             login_user(user)
             return redirect(url_for('home'))
         else:
-            return "Error: Usuario o contraseña incorrectos"
+            return render_template('login.html', error="Usuario o contraseña incorrectos")
     return render_template('login.html')
 
 @app.route('/logout')
@@ -79,11 +79,9 @@ def logout():
 def home():
     hoy = datetime.today()
     
-    # ¿Qué mes quiere ver el usuario? 
     anio_seleccionado = request.args.get('anio', type=int, default=hoy.year)
     mes_seleccionado = request.args.get('mes', type=int, default=hoy.month)
 
-    # ¿Qué meses tienen datos para este usuario? 
     fechas_disponibles = db.session.query(
         extract('year', Transaccion.fecha).label('anio'),
         extract('month', Transaccion.fecha).label('mes')
@@ -92,20 +90,29 @@ def home():
      .order_by(desc('anio'), desc('mes'))\
      .all()
 
-    # Filtrar las transacciones del mes seleccionado
     transacciones = Transaccion.query.filter(
         Transaccion.user_id == current_user.id, 
         extract('month', Transaccion.fecha) == mes_seleccionado,
         extract('year', Transaccion.fecha) == anio_seleccionado
     ).order_by(Transaccion.fecha.desc()).all()
 
-    # Cálculos
     total_ingresos = sum(t.monto for t in transacciones if t.tipo == 'ingreso')
     total_gastos = sum(t.monto for t in transacciones if t.tipo == 'gasto')
     saldo = total_ingresos - total_gastos
 
-    nombres_meses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+    datos_gastos = {} 
+    for t in transacciones:
+        if t.tipo == 'gasto':
+            if t.categoria in datos_gastos:
+                datos_gastos[t.categoria] += t.monto
+            else:
+                datos_gastos[t.categoria] = t.monto
     
+    labels_grafico = list(datos_gastos.keys())
+    values_grafico = list(datos_gastos.values())
+
+    nombres_meses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
     return render_template('index.html', 
                            transacciones=transacciones, 
                            ingresos=total_ingresos, 
@@ -114,9 +121,12 @@ def home():
                            mes_nombre=nombres_meses[mes_seleccionado], 
                            anio_actual=anio_seleccionado,
                            mes_actual=mes_seleccionado,
-                           fechas_menu=fechas_disponibles, 
-                           nombres_meses=nombres_meses, 
-                           usuario=current_user.username)
+                           fechas_menu=fechas_disponibles,
+                           nombres_meses=nombres_meses,
+                           usuario=current_user.username,
+                           labels_grafico=labels_grafico,
+                           values_grafico=values_grafico)
+
 
 @app.route('/agregar', methods=['POST'])
 @login_required

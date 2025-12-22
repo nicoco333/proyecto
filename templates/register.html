@@ -20,6 +20,11 @@
 <body>
     <div class="form-container" style="text-align: center; width: 100%; max-width: 400px;">
         <h2>Crear Cuenta</h2>
+        {% if error %}
+            <div class="alert-error">
+                {{ error }}
+            </div>
+        {% endif %}
         <form action="/register" method="POST">
             <input type="text" name="username" placeholder="Elige un Usuario" required>
             <input type="password" name="password" placeholder="Elige una Contraseña" required>

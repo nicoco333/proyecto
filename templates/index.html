@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Wallet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
     <aside class="sidebar">
         <div>
-            <h2>🎓 Wallet</h2>
+            <h2>Wallet</h2>
             <p style="font-size: 0.9rem; opacity: 0.7;">Hola, {{ usuario }}</p>
-            
+
             <h3 style="margin-top: 30px; font-size: 0.9rem; text-transform: uppercase; opacity: 0.5;">Historial</h3>
             <ul>
                 <li>
@@ -24,8 +27,8 @@
 
                 {% for f in fechas_menu %}
                 <li>
-                    <a href="/?mes={{ f.mes }}&anio={{ f.anio }}" 
-                       class="{{ 'activo' if mes_actual == f.mes and anio_actual == f.anio else '' }}">
+                    <a href="/?mes={{ f.mes }}&anio={{ f.anio }}"
+                        class="{{ 'activo' if mes_actual == f.mes and anio_actual == f.anio else '' }}">
                         <i class="fas fa-history"></i> {{ nombres_meses[f.mes] }} {{ f.anio }}
                     </a>
                 </li>
@@ -39,7 +42,7 @@
     </aside>
 
     <main class="main-content">
-        
+
         <header>
             <h1>Resumen de <span style="color: #2980b9;">{{ mes_nombre }} {{ anio_actual }}</span></h1>
         </header>
@@ -58,6 +61,19 @@
                 <p>- ${{ gastos }}</p>
             </div>
         </div>
+
+        {% if gastos > 0 %}
+        <div class="chart-container"
+            style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-around;">
+            <div style="width: 300px;"> <canvas id="gastosChart"></canvas>
+            </div>
+            <div style="max-width: 400px; text-align: left;">
+                <h3> Análisis de Gastos</h3>
+                <p style="color: #666;">Visualiza en qué categorías estás gastando más dinero este mes. Intenta mantener
+                    equilibrado el gráfico.</p>
+            </div>
+        </div>
+        {% endif %}
 
         <div class="form-container">
             <h3>📝 Nuevo Movimiento</h3>
@@ -86,29 +102,67 @@
         <div class="lista-movimientos">
             <h3>Movimientos</h3>
             {% if transacciones|length == 0 %}
-                <p style="text-align: center; color: #999;">No hay registros en este periodo.</p>
+            <p style="text-align: center; color: #999;">No hay registros en este periodo.</p>
             {% else %}
-                <ul>
-                    {% for t in transacciones %}
-                    <li class="item-movimiento {{ t.tipo }}">
-                        <div>
-                            <span style="font-weight: bold;">{{ t.descripcion }}</span>
-                            <small style="color: #777; margin-left: 10px;">{{ t.categoria }}</small>
-                            <div style="font-size: 0.8rem; color: #aaa;">{{ t.fecha.strftime('%d/%m/%Y') }}</div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span class="monto {{ t.tipo }}">
-                                {% if t.tipo == 'ingreso' %}+{% else %}-{% endif %} ${{ t.monto }}
-                            </span>
-                            <a href="/delete/{{ t.id }}" style="color: #ccc;"><i class="fas fa-trash"></i></a>
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
+            <ul>
+                {% for t in transacciones %}
+                <li class="item-movimiento {{ t.tipo }}">
+                    <div>
+                        <span style="font-weight: bold;">{{ t.descripcion }}</span>
+                        <small style="color: #777; margin-left: 10px;">{{ t.categoria }}</small>
+                        <div style="font-size: 0.8rem; color: #aaa;">{{ t.fecha.strftime('%d/%m/%Y') }}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="monto {{ t.tipo }}">
+                            {% if t.tipo == 'ingreso' %}+{% else %}-{% endif %} ${{ t.monto }}
+                        </span>
+                        <a href="/delete/{{ t.id }}" style="color: #ccc;"><i class="fas fa-trash"></i></a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
             {% endif %}
         </div>
 
     </main>
+    <script>
+        // Obtenemos los datos que nos mandó Python (Jinja2 los escribe aquí)
+        // El filtro |tojson convierte la lista de Python a texto que JS entiende
+        const labels = {{ labels_grafico | tojson }};
+        const data = {{ values_grafico | tojson }};
 
+        if (labels.length > 0) {
+            const ctx = document.getElementById('gastosChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut', // Tipo de gráfico: Dona
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Monto ($)',
+                        data: data,
+                        backgroundColor: [
+                            '#e74c3c', // Rojo
+                            '#3498db', // Azul
+                            '#f1c40f', // Amarillo
+                            '#2ecc71', // Verde
+                            '#9b59b6', // Violeta
+                            '#e67e22', // Naranja
+                            '#95a5a6'  // Gris
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
+
 </html>
