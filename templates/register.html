@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="main-container" style="max-width: 700px; margin-top: 80px;">
+        <div class="form-container" style="text-align: center;">
+            <h2>Crear Cuenta</h2>
+            <form action="/register" method="POST">
+                <input type="text" name="username" placeholder="Elige un Usuario" required>
+                <input type="password" name="password" placeholder="Elige una Contraseña" required>
+                <button type="submit" class="btn-add" style="background-color: #2ecc71;">Registrarse</button>
+            </form>
+            <p style="margin-top: 25px;">
+                ¿Ya tienes cuenta? <a href="/login">Inicia Sesión</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

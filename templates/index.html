@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,27 +8,36 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
 
     <div class="main-container">
-        
+
         <header>
-            <h1>🎓 Student Wallet <span class="mes-badge">{{ mes }}</span></h1>
-            
-            <div class="dashboard">
-                <div class="card ingreso">
-                    <h3>Ingresos</h3>
-                    <p>+ ${{ ingresos }}</p>
-                </div>
-                <div class="card saldo">
-                    <h3>Saldo Disponible</h3>
-                    <p>${{ saldo }}</p>
-                </div>
-                <div class="card gasto">
-                    <h3>Gastos</h3>
-                    <p>- ${{ gastos }}</p>
-                </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>🎓 Hola, {{ usuario }} <span class="mes-badge">{{ mes }}</span></h1>
+                <a href="/logout"
+                    style="color: #e74c3c; text-decoration: none; font-weight: bold; border: 1px solid #e74c3c; padding: 5px 10px; border-radius: 5px;">
+                    Salir <i class="fas fa-sign-out-alt"></i>
+                </a>
             </div>
+
+            <div class="dashboard">
+
+                <div class="dashboard">
+                    <div class="card ingreso">
+                        <h3>Ingresos</h3>
+                        <p>+ ${{ ingresos }}</p>
+                    </div>
+                    <div class="card saldo">
+                        <h3>Saldo Disponible</h3>
+                        <p>${{ saldo }}</p>
+                    </div>
+                    <div class="card gasto">
+                        <h3>Gastos</h3>
+                        <p>- ${{ gastos }}</p>
+                    </div>
+                </div>
         </header>
 
         <div class="form-container">
@@ -35,11 +45,11 @@
             <form action="/agregar" method="POST">
                 <div class="tipo-selector">
                     <label>
-                        <input type="radio" name="tipo" value="gasto" checked> 
+                        <input type="radio" name="tipo" value="gasto" checked>
                         <span class="btn-radio rojo">Gasto</span>
                     </label>
                     <label>
-                        <input type="radio" name="tipo" value="ingreso"> 
+                        <input type="radio" name="tipo" value="ingreso">
                         <span class="btn-radio verde">Ingreso</span>
                     </label>
                 </div>
@@ -48,7 +58,7 @@
                     <input type="text" name="descripcion" placeholder="Descripción (ej. Fotocopias)" required>
                     <input type="number" step="0.01" name="monto" placeholder="Monto" required>
                 </div>
-                
+
                 <select name="categoria" required>
                     <option value="" disabled selected>Categoría</option>
                     <option value="Comida">Comida</option>
@@ -67,29 +77,30 @@
         <div class="lista-movimientos">
             <h2>Movimientos del Mes</h2>
             {% if transacciones|length == 0 %}
-                <p class="empty-msg">Aún no tienes movimientos este mes.</p>
+            <p class="empty-msg">Aún no tienes movimientos este mes.</p>
             {% else %}
-                <ul>
-                    {% for t in transacciones %}
-                    <li class="item-movimiento {{ t.tipo }}">
-                        <div class="info">
-                            <span class="cat">{{ t.categoria }}</span>
-                            <span class="desc">{{ t.descripcion }}</span>
-                            <span class="date">{{ t.fecha.strftime('%d/%m') }}</span>
-                        </div>
-                        <div class="monto-action">
-                            <span class="monto">
-                                {% if t.tipo == 'ingreso' %}+{% else %}-{% endif %} ${{ t.monto }}
-                            </span>
-                            <a href="/delete/{{ t.id }}" class="btn-delete"><i class="fas fa-trash"></i></a>
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
+            <ul>
+                {% for t in transacciones %}
+                <li class="item-movimiento {{ t.tipo }}">
+                    <div class="info">
+                        <span class="cat">{{ t.categoria }}</span>
+                        <span class="desc">{{ t.descripcion }}</span>
+                        <span class="date">{{ t.fecha.strftime('%d/%m') }}</span>
+                    </div>
+                    <div class="monto-action">
+                        <span class="monto">
+                            {% if t.tipo == 'ingreso' %}+{% else %}-{% endif %} ${{ t.monto }}
+                        </span>
+                        <a href="/delete/{{ t.id }}" class="btn-delete"><i class="fas fa-trash"></i></a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
             {% endif %}
         </div>
 
     </div>
 
 </body>
+
 </html>
