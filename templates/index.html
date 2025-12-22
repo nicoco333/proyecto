@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,99 +7,108 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
 <body>
 
-    <div class="main-container">
+    <aside class="sidebar">
+        <div>
+            <h2>🎓 Wallet</h2>
+            <p style="font-size: 0.9rem; opacity: 0.7;">Hola, {{ usuario }}</p>
+            
+            <h3 style="margin-top: 30px; font-size: 0.9rem; text-transform: uppercase; opacity: 0.5;">Historial</h3>
+            <ul>
+                <li>
+                    <a href="/" class="{{ 'activo' if not request.args.get('mes') else '' }}">
+                        <i class="fas fa-calendar-day"></i> Mes Actual
+                    </a>
+                </li>
 
+                {% for f in fechas_menu %}
+                <li>
+                    <a href="/?mes={{ f.mes }}&anio={{ f.anio }}" 
+                       class="{{ 'activo' if mes_actual == f.mes and anio_actual == f.anio else '' }}">
+                        <i class="fas fa-history"></i> {{ nombres_meses[f.mes] }} {{ f.anio }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <a href="/logout" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
+    </aside>
+
+    <main class="main-content">
+        
         <header>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h1>🎓 Hola, {{ usuario }} <span class="mes-badge">{{ mes }}</span></h1>
-                <a href="/logout"
-                    style="color: #e74c3c; text-decoration: none; font-weight: bold; border: 1px solid #e74c3c; padding: 5px 10px; border-radius: 5px;">
-                    Salir <i class="fas fa-sign-out-alt"></i>
-                </a>
-            </div>
-
-            <div class="dashboard">
-
-                <div class="dashboard">
-                    <div class="card ingreso">
-                        <h3>Ingresos</h3>
-                        <p>+ ${{ ingresos }}</p>
-                    </div>
-                    <div class="card saldo">
-                        <h3>Saldo Disponible</h3>
-                        <p>${{ saldo }}</p>
-                    </div>
-                    <div class="card gasto">
-                        <h3>Gastos</h3>
-                        <p>- ${{ gastos }}</p>
-                    </div>
-                </div>
+            <h1>Resumen de <span style="color: #2980b9;">{{ mes_nombre }} {{ anio_actual }}</span></h1>
         </header>
 
-        <div class="form-container">
-            <h2>Nueva Operación</h2>
-            <form action="/agregar" method="POST">
-                <div class="tipo-selector">
-                    <label>
-                        <input type="radio" name="tipo" value="gasto" checked>
-                        <span class="btn-radio rojo">Gasto</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="tipo" value="ingreso">
-                        <span class="btn-radio verde">Ingreso</span>
-                    </label>
-                </div>
+        <div class="dashboard">
+            <div class="card ingreso">
+                <h3>Ingresos</h3>
+                <p>+ ${{ ingresos }}</p>
+            </div>
+            <div class="card saldo">
+                <h3>Saldo {{ mes_nombre }}</h3>
+                <p>${{ saldo }}</p>
+            </div>
+            <div class="card gasto">
+                <h3>Gastos</h3>
+                <p>- ${{ gastos }}</p>
+            </div>
+        </div>
 
+        <div class="form-container">
+            <h3>📝 Nuevo Movimiento</h3>
+            <form action="/agregar" method="POST">
+                <div class="inputs-row" style="margin-bottom: 10px;">
+                    <label style="flex:1;"><input type="radio" name="tipo" value="gasto" checked> 🔴 Gasto</label>
+                    <label style="flex:1;"><input type="radio" name="tipo" value="ingreso"> 🟢 Ingreso</label>
+                </div>
                 <div class="inputs-row">
-                    <input type="text" name="descripcion" placeholder="Descripción (ej. Fotocopias)" required>
+                    <input type="text" name="descripcion" placeholder="Descripción" required>
                     <input type="number" step="0.01" name="monto" placeholder="Monto" required>
                 </div>
-
                 <select name="categoria" required>
                     <option value="" disabled selected>Categoría</option>
                     <option value="Comida">Comida</option>
                     <option value="Transporte">Transporte</option>
                     <option value="Estudios">Estudios</option>
                     <option value="Salidas">Salidas</option>
-                    <option value="Trabajo">Sueldo/Trabajo</option>
-                    <option value="Familia">Ayuda Familiar</option>
+                    <option value="Trabajo">Ingresos/Sueldo</option>
                     <option value="Otro">Otro</option>
                 </select>
-
                 <button type="submit" class="btn-add">Guardar</button>
             </form>
         </div>
 
         <div class="lista-movimientos">
-            <h2>Movimientos del Mes</h2>
+            <h3>Movimientos</h3>
             {% if transacciones|length == 0 %}
-            <p class="empty-msg">Aún no tienes movimientos este mes.</p>
+                <p style="text-align: center; color: #999;">No hay registros en este periodo.</p>
             {% else %}
-            <ul>
-                {% for t in transacciones %}
-                <li class="item-movimiento {{ t.tipo }}">
-                    <div class="info">
-                        <span class="cat">{{ t.categoria }}</span>
-                        <span class="desc">{{ t.descripcion }}</span>
-                        <span class="date">{{ t.fecha.strftime('%d/%m') }}</span>
-                    </div>
-                    <div class="monto-action">
-                        <span class="monto">
-                            {% if t.tipo == 'ingreso' %}+{% else %}-{% endif %} ${{ t.monto }}
-                        </span>
-                        <a href="/delete/{{ t.id }}" class="btn-delete"><i class="fas fa-trash"></i></a>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+                <ul>
+                    {% for t in transacciones %}
+                    <li class="item-movimiento {{ t.tipo }}">
+                        <div>
+                            <span style="font-weight: bold;">{{ t.descripcion }}</span>
+                            <small style="color: #777; margin-left: 10px;">{{ t.categoria }}</small>
+                            <div style="font-size: 0.8rem; color: #aaa;">{{ t.fecha.strftime('%d/%m/%Y') }}</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="monto {{ t.tipo }}">
+                                {% if t.tipo == 'ingreso' %}+{% else %}-{% endif %} ${{ t.monto }}
+                            </span>
+                            <a href="/delete/{{ t.id }}" style="color: #ccc;"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
             {% endif %}
         </div>
 
-    </div>
+    </main>
 
 </body>
-
 </html>

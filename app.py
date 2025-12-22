@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from sqlalchemy import extract
+from sqlalchemy import extract, desc
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 
@@ -48,19 +48,13 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
-        # Encriptamos la contraseña
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        
-        # Creamos el usuario
+        if User.query.filter_by(username=username).first():
+            return "El usuario ya existe"
         nuevo_usuario = User(username=username, password=hashed_password)
-        try:
-            db.session.add(nuevo_usuario)
-            db.session.commit()
-            return redirect(url_for('login'))
-        except:
-            return "El nombre de usuario ya existe"
-            
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+        return redirect(url_for('login'))
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -71,8 +65,7 @@ def login():
             login_user(user)
             return redirect(url_for('home'))
         else:
-            return "Usuario o contraseña incorrectos"
-            
+            return "Error: Usuario o contraseña incorrectos"
     return render_template('login.html')
 
 @app.route('/logout')
@@ -84,57 +77,70 @@ def logout():
 @app.route('/')
 @login_required
 def home():
-    # Obtenemos fecha actual para filtrar el mes
     hoy = datetime.today()
     
-    # Filtramos las transacciones de ESTE mes y ESTE año
+    # ¿Qué mes quiere ver el usuario? 
+    anio_seleccionado = request.args.get('anio', type=int, default=hoy.year)
+    mes_seleccionado = request.args.get('mes', type=int, default=hoy.month)
+
+    # ¿Qué meses tienen datos para este usuario? 
+    fechas_disponibles = db.session.query(
+        extract('year', Transaccion.fecha).label('anio'),
+        extract('month', Transaccion.fecha).label('mes')
+    ).filter(Transaccion.user_id == current_user.id)\
+     .group_by('anio', 'mes')\
+     .order_by(desc('anio'), desc('mes'))\
+     .all()
+
+    # Filtrar las transacciones del mes seleccionado
     transacciones = Transaccion.query.filter(
-        Transaccion.user_id == current_user.id,
-        extract('month', Transaccion.fecha) == hoy.month,
-        extract('year', Transaccion.fecha) == hoy.year
+        Transaccion.user_id == current_user.id, 
+        extract('month', Transaccion.fecha) == mes_seleccionado,
+        extract('year', Transaccion.fecha) == anio_seleccionado
     ).order_by(Transaccion.fecha.desc()).all()
 
-    # Calculamos los totales matemáticamente
+    # Cálculos
     total_ingresos = sum(t.monto for t in transacciones if t.tipo == 'ingreso')
     total_gastos = sum(t.monto for t in transacciones if t.tipo == 'gasto')
     saldo = total_ingresos - total_gastos
 
-    # Formateamos el nombre del mes (truco rápido)
     nombres_meses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-    nombre_mes = names_meses = nombres_meses[hoy.month]
-
+    
     return render_template('index.html', 
                            transacciones=transacciones, 
                            ingresos=total_ingresos, 
                            gastos=total_gastos, 
                            saldo=saldo,
-                           mes=nombre_mes,
+                           mes_nombre=nombres_meses[mes_seleccionado], 
+                           anio_actual=anio_seleccionado,
+                           mes_actual=mes_seleccionado,
+                           fechas_menu=fechas_disponibles, 
+                           nombres_meses=nombres_meses, 
                            usuario=current_user.username)
 
 @app.route('/agregar', methods=['POST'])
+@login_required
 def agregar():
+    # ... (Igual que antes) ...
     descripcion = request.form['descripcion']
     monto = float(request.form['monto'])
     categoria = request.form['categoria']
-    tipo = request.form['tipo'] 
+    tipo = request.form['tipo']
 
     nova_transaccion = Transaccion(
-        descripcion=descripcion, 
-        monto=monto, 
-        categoria=categoria, 
-        tipo=tipo,
-        user_id=current_user.id
+        descripcion=descripcion, monto=monto, categoria=categoria, tipo=tipo, user_id=current_user.id
     )
-
     db.session.add(nova_transaccion)
     db.session.commit()
     return redirect(url_for('home'))
 
 @app.route('/delete/<int:id>')
+@login_required
 def delete(id):
     item = Transaccion.query.get_or_404(id)
-    db.session.delete(item)
-    db.session.commit()
+    if item.user_id == current_user.id:
+        db.session.delete(item)
+        db.session.commit()
     return redirect(url_for('home'))
 
 with app.app_context():
