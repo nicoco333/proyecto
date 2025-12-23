@@ -62,19 +62,6 @@
             </div>
         </div>
 
-        {% if gastos > 0 %}
-        <div class="chart-container"
-            style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-around;">
-            <div style="width: 300px;"> <canvas id="gastosChart"></canvas>
-            </div>
-            <div style="max-width: 400px; text-align: left;">
-                <h3> Análisis de Gastos</h3>
-                <p style="color: #666;">Visualiza en qué categorías estás gastando más dinero este mes. Intenta mantener
-                    equilibrado el gráfico.</p>
-            </div>
-        </div>
-        {% endif %}
-
         <div class="form-container">
             <h3>📝 Nuevo Movimiento</h3>
             <form action="/agregar" method="POST">
@@ -123,7 +110,18 @@
             </ul>
             {% endif %}
         </div>
-
+                {% if gastos > 0 %}
+        <div class="chart-container"
+            style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-around;">
+            <div style="width: 300px;"> <canvas id="gastosChart"></canvas>
+            </div>
+            <div style="max-width: 400px; text-align: left;">
+                <h3> Análisis de Gastos</h3>
+                <p style="color: #666;">Visualiza en qué categorías estás gastando más dinero este mes. Intenta mantener
+                    equilibrado el gráfico.</p>
+            </div>
+        </div>
+        {% endif %}
     </main>
     <script>
         // Obtenemos los datos que nos mandó Python (Jinja2 los escribe aquí)
