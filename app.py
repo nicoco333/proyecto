@@ -4,6 +4,9 @@ from datetime import datetime
 from sqlalchemy import extract, desc
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
+import csv
+from io import StringIO
+from flask import make_response
 
 app = Flask(__name__)
 
@@ -152,6 +155,39 @@ def delete(id):
         db.session.delete(item)
         db.session.commit()
     return redirect(url_for('home'))
+
+@app.route('/descargar_reporte')
+@login_required
+def descargar_reporte():
+    hoy = datetime.today()
+    anio = request.args.get('anio', type=int, default=hoy.year)
+    mes = request.args.get('mes', type=int, default=hoy.month)
+
+    transacciones = Transaccion.query.filter(
+        Transaccion.user_id == current_user.id, 
+        extract('month', Transaccion.fecha) == mes,
+        extract('year', Transaccion.fecha) == anio
+    ).order_by(Transaccion.fecha.desc()).all()
+
+    si = StringIO()
+    cw = csv.writer(si)
+        
+    cw.writerow(['Fecha', 'Tipo', 'Categoria', 'Descripcion', 'Monto'])
+
+    for t in transacciones:
+        cw.writerow([
+            t.fecha.strftime('%d/%m/%Y'),
+            t.tipo,
+            t.categoria,
+            t.descripcion,
+            t.monto
+        ])
+
+    output = make_response(si.getvalue())
+    output.headers["Content-Disposition"] = f"attachment; filename=reporte_{mes}_{anio}.csv"
+    output.headers["Content-type"] = "text/csv"
+    
+    return output
 
 with app.app_context():
         db.create_all()

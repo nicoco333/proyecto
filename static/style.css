@@ -191,3 +191,53 @@ select {
     justify-content: center;
     gap: 10px;
 }
+
+/* --- BOTONES TOGGLE (SELECTOR GASTO/INGRESO) --- */
+.toggle-container {
+    display: flex;
+    gap: 15px; /* Espacio entre los botones */
+    margin-bottom: 15px;
+}
+
+/* 1. Ocultamos el círculo feo por defecto */
+.toggle-container input[type="radio"] {
+    display: none;
+}
+
+/* 2. Estilo base del botón (cuando está apagado) */
+.toggle-btn {
+    flex: 1; /* Que ocupen el mismo ancho */
+    padding: 15px;
+    text-align: center;
+    border: 2px solid #eee; /* Borde gris suave */
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #bbb; /* Texto gris */
+    transition: all 0.3s ease; /* Animación suave */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espacio entre ícono y texto */
+}
+
+.toggle-btn:hover {
+    background-color: #f9f9f9;
+}
+
+/* 3. Estilo cuando seleccionas GASTO (Rojo) */
+/* La lógica es: "Cuando el input 'tipo-gasto' esté checked, cambia su label hermano" */
+input#tipo-gasto:checked + .toggle-btn.gasto {
+    border-color: #e74c3c;
+    background-color: #fceceb;
+    color: #e74c3c;
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2); /* Sombrita roja */
+}
+
+/* 4. Estilo cuando seleccionas INGRESO (Verde) */
+input#tipo-ingreso:checked + .toggle-btn.ingreso {
+    border-color: #2ecc71;
+    background-color: #eafaf1;
+    color: #2ecc71;
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2); /* Sombrita verde */
+}
