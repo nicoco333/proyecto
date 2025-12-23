@@ -12,8 +12,8 @@
 
 <body>
 
-<aside class="sidebar" id="sidebar">
-        
+    <aside class="sidebar" id="sidebar">
+
         <button id="close-btn" class="close-btn">&times;</button>
 
         <div>
@@ -46,12 +46,21 @@
 
     <main class="main-content">
 
-        <header style="display: flex; justify-content: space-between; align-items: center;">
-            <h1>Resumen de <span style="color: #2980b9;">{{ mes_nombre }} {{ anio_actual }}</span></h1>
-            
-            <a href="/descargar_reporte?mes={{ mes_actual }}&anio={{ anio_actual }}" 
-            style="background-color: #27ae60; color: white; padding: 10px 15px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 0.9rem;">
-                <i class="fas fa-file-csv"></i> Descargar Excel
+        <header style="display: flex; align-items: center; gap: 15px; padding: 10px 0;">
+
+            <button class="menu-toggle" onclick="toggleSidebar()" 
+                    style="background: none; border: none; font-size: 2rem; cursor: pointer; color: #333; position: relative; z-index: 9999;">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div style="flex: 1;">
+                <h1 style="font-size: 1.2rem; margin: 0;">
+                    Resumen <span style="color: #2980b9;">{{ mes_nombre }}</span>
+                </h1>
+            </div>
+
+            <a href="/descargar_reporte?mes={{ mes_actual }}&anio={{ anio_actual }}" class="btn-excel">
+                <i class="fas fa-file-csv"></i> <span class="text-excel">Excel</span>
             </a>
         </header>
 
@@ -125,7 +134,7 @@
             </ul>
             {% endif %}
         </div>
-                {% if gastos > 0 %}
+        {% if gastos > 0 %}
         <div class="chart-container"
             style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-around;">
             <div style="width: 300px;"> <canvas id="gastosChart"></canvas>
@@ -145,20 +154,20 @@
         if (labels.length > 0) {
             const ctx = document.getElementById('gastosChart').getContext('2d');
             new Chart(ctx, {
-                type: 'doughnut', 
+                type: 'doughnut',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'Monto ($)',
                         data: data,
                         backgroundColor: [
-                            '#e74c3c', 
-                            '#3498db', 
-                            '#f1c40f', 
-                            '#2ecc71', 
-                            '#9b59b6', 
-                            '#e67e22', 
-                            '#95a5a6'   
+                            '#e74c3c',
+                            '#3498db',
+                            '#f1c40f',
+                            '#2ecc71',
+                            '#9b59b6',
+                            '#e67e22',
+                            '#95a5a6'
                         ],
                         hoverOffset: 4
                     }]
@@ -174,25 +183,40 @@
             });
         }
     </script>
-    <script>    
-    const sidebar = document.getElementById('sidebar');
-    const menuToggle = document.getElementById('menu-toggle');
-    const closeBtn = document.getElementById('close-btn');
+    <script>
+        // Función global directa
+        function toggleSidebar() {
+            console.log("¡Click detectado!"); // Esto TIENE que salir ahora
+            const sidebar = document.getElementById('sidebar');
+            const menuToggleBtn = document.querySelector('.menu-toggle');
+            
+            // 1. Alternar la clase 'active' en la barra
+            sidebar.classList.toggle('active');
 
-    menuToggle.addEventListener('click', () => {
-        sidebar.classList.add('active');
-    });
-
-    closeBtn.addEventListener('click', () => {
-        sidebar.classList.remove('active');
-    });
-
-    document.querySelector('.main-content').addEventListener('click', () => {
-        if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
-            sidebar.classList.remove('active');
+            // 2. Lógica para ocultar/mostrar el botón de hamburguesa
+            if (sidebar.classList.contains('active')) {
+                // Si la barra se ABRÓ -> OCULTAMOS el botón
+                menuToggleBtn.style.display = 'none';
+            } else {
+                // Si la barra se CERRÓ -> MOSTRAMOS el botón
+                menuToggleBtn.style.display = 'block';
+            }
         }
-    });
-</script>
+
+        // Funcionalidad para el botón de cerrar (la X dentro del menú)
+        const closeBtn = document.getElementById('close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                const menuToggleBtn = document.querySelector('.menu-toggle');
+                
+                // Cerramos la barra
+                sidebar.classList.remove('active');
+                // Y aseguramos que el botón de hamburguesa vuelva a aparecer
+                menuToggleBtn.style.display = 'block';
+            });
+        }
+    </script>
 </body>
 
 </html>

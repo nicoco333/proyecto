@@ -7,13 +7,22 @@ from flask_bcrypt import Bcrypt
 import csv
 from io import StringIO
 from flask import make_response
+import os
 
 app = Flask(__name__)
 
 # CONFIGURACIÓN DE LA BASE DE DATOS
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///finanzas_estudiante.db' 
+database_url = os.environ.get('DATABASE_URL') 
+
+if database_url:
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///finanzas_estudiante.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'una_clave_secreta_muy_dificil'
+app.config['SECRET_KEY'] = 'clave_secreta_super_segura'
 
 # Inicializamos la base de datos
 db = SQLAlchemy(app)

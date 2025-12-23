@@ -270,24 +270,27 @@ input#tipo-ingreso:checked + .toggle-btn.ingreso {
         width: 250px;
         height: 100vh;         /* Altura completa */
         z-index: 1000;         /* Encima de todo */
+        background-color: #2c3e50;
         transition: 0.3s ease; /* Animación suave */
-        box-shadow: 2px 0 10px rgba(0,0,0,0.5);
     }
 
     /* Esta clase se agrega con JS para mostrar la barra */
     .sidebar.active {
         left: 0;               /* VUELVE A LA PANTALLA */
+        box-shadow: 5px 0 15px rgba(0,0,0,0.5);
     }
 
     /* 2. Botones de Control */
     .menu-toggle {
-        display: block;        /* Ahora sí mostramos la hamburguesa */
+        display: block;
         background: none;
         border: none;
-        font-size: 1.5rem;
+        font-size: 1.8rem; /* Un poco más grande para el dedo */
         cursor: pointer;
         color: #333;
-        margin-right: 10px;
+        margin-right: 15px;
+        position: relative; /* Importante */
+        z-index: 1001;      /* ¡ENCIMA DE TODO! */
     }
 
     .close-btn {
@@ -321,5 +324,8 @@ input#tipo-ingreso:checked + .toggle-btn.ingreso {
     /* Ocultar la palabra "Excel" y dejar solo el ícono para ahorrar espacio */
     .text-excel {
         display: none;
+    }
+    header {
+        flex-wrap: nowrap; /* Que no se rompa en dos líneas */
     }
 }
