@@ -67,16 +67,35 @@
             </div>
         </div>
 
-        <div class="toggle-container">
-            <input type="radio" id="tipo-gasto" name="tipo" value="gasto" checked>
-            <label for="tipo-gasto" class="toggle-btn gasto">
-                <i class="fas fa-arrow-down"></i> Gasto
-            </label>
+        <div class="form-container">
+            <h3>📝 Nuevo Movimiento</h3>
+            <form action="/agregar" method="POST">
+                <div class="toggle-container">
+                    <input type="radio" id="tipo-gasto" name="tipo" value="gasto" checked>
+                    <label for="tipo-gasto" class="toggle-btn gasto">
+                        <i class="fas fa-arrow-down"></i> Gasto
+                    </label>
 
-            <input type="radio" id="tipo-ingreso" name="tipo" value="ingreso">
-            <label for="tipo-ingreso" class="toggle-btn ingreso">
-                <i class="fas fa-arrow-up"></i> Ingreso
-            </label>
+                    <input type="radio" id="tipo-ingreso" name="tipo" value="ingreso">
+                    <label for="tipo-ingreso" class="toggle-btn ingreso">
+                        <i class="fas fa-arrow-up"></i> Ingreso
+                    </label>
+                </div>
+                <div class="inputs-row">
+                    <input type="text" name="descripcion" placeholder="Descripción" required>
+                    <input type="number" step="0.01" name="monto" placeholder="Monto" required>
+                </div>
+                <select name="categoria" required>
+                    <option value="" disabled selected>Categoría</option>
+                    <option value="Comida">Comida</option>
+                    <option value="Transporte">Transporte</option>
+                    <option value="Estudios">Estudios</option>
+                    <option value="Salidas">Salidas</option>
+                    <option value="Trabajo">Ingresos/Sueldo</option>
+                    <option value="Otro">Otro</option>
+                </select>
+                <button type="submit" class="btn-add">Guardar</button>
+            </form>
         </div>
 
         <div class="lista-movimientos">
