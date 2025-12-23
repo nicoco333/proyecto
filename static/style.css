@@ -241,3 +241,85 @@ input#tipo-ingreso:checked + .toggle-btn.ingreso {
     color: #2ecc71;
     box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2); /* Sombrita verde */
 }
+
+
+/* --- ESTILOS RESPONSIVE (MÓVIL) --- */
+
+/* Por defecto (PC), escondemos los botones móviles */
+.menu-toggle, .close-btn {
+    display: none;
+}
+
+/* Clase auxiliar para el botón de Excel en móvil */
+.btn-excel {
+    background-color: #27ae60; color: white; padding: 10px 15px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 0.9rem; white-space: nowrap;
+}
+
+/* MEDIA QUERY: Reglas que solo aplican si la pantalla es menor a 768px (Tablets y Celulares) */
+@media (max-width: 768px) {
+    
+    body {
+        flex-direction: column; /* Ya no uno al lado del otro */
+    }
+
+    /* 1. Configuración de la Barra Lateral Móvil */
+    .sidebar {
+        position: fixed;       /* Flota sobre todo */
+        top: 0;
+        left: -100%;           /* ESCONDIDA A LA IZQUIERDA */
+        width: 250px;
+        height: 100vh;         /* Altura completa */
+        z-index: 1000;         /* Encima de todo */
+        transition: 0.3s ease; /* Animación suave */
+        box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    }
+
+    /* Esta clase se agrega con JS para mostrar la barra */
+    .sidebar.active {
+        left: 0;               /* VUELVE A LA PANTALLA */
+    }
+
+    /* 2. Botones de Control */
+    .menu-toggle {
+        display: block;        /* Ahora sí mostramos la hamburguesa */
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #333;
+        margin-right: 10px;
+    }
+
+    .close-btn {
+        display: block;        /* Mostramos la X */
+        background: none;
+        border: none;
+        color: white;
+        font-size: 2rem;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        cursor: pointer;
+    }
+
+    /* 3. Ajustes de contenido para que no se rompa */
+    .main-content {
+        padding: 15px;         /* Menos relleno en celular */
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Ajustar tarjetas para que se apilen */
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .chart-container {
+        flex-direction: column; /* Gráfico arriba, texto abajo */
+    }
+
+    /* Ocultar la palabra "Excel" y dejar solo el ícono para ahorrar espacio */
+    .text-excel {
+        display: none;
+    }
+}

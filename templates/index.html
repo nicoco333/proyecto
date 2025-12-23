@@ -12,7 +12,10 @@
 
 <body>
 
-    <aside class="sidebar">
+<aside class="sidebar" id="sidebar">
+        
+        <button id="close-btn" class="close-btn">&times;</button>
+
         <div>
             <h2>Wallet</h2>
             <p style="font-size: 0.9rem; opacity: 0.7;">Hola, {{ usuario }}</p>
@@ -171,6 +174,25 @@
             });
         }
     </script>
+    <script>    
+    const sidebar = document.getElementById('sidebar');
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeBtn = document.getElementById('close-btn');
+
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.add('active');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+    });
+
+    document.querySelector('.main-content').addEventListener('click', () => {
+        if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    });
+</script>
 </body>
 
 </html>
