@@ -35,6 +35,7 @@ login_manager.login_view = 'login'
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
+    email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     # Relación: Un usuario tiene muchas transacciones
     transacciones = db.relationship('Transaccion', backref='dueno', lazy=True)
@@ -59,14 +60,21 @@ def load_user(user_id):
 def register():
     if request.method == 'POST':
         username = request.form['username']
+        email = request.form['email'] 
         password = request.form['password']
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
         if User.query.filter_by(username=username).first():
-            return render_template('register.html', error="Ese nombre de usuario ya está en uso.")
-        nuevo_usuario = User(username=username, password=hashed_password)
+            return render_template('register.html', error="⚠️ El usuario ya existe.")
+
+        if User.query.filter_by(email=email).first():
+            return render_template('register.html', error="⚠️ Ese email ya está registrado.")
+
+        nuevo_usuario = User(username=username, email=email, password=hashed_password)
         db.session.add(nuevo_usuario)
         db.session.commit()
         return redirect(url_for('login'))
+            
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
