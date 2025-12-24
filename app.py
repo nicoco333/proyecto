@@ -49,8 +49,8 @@ login_manager.login_view = 'login'
 # --- MODELO DE USUARIO (NUEVO) ---
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), nullable=False, unique=True)
-    email = db.Column(db.String(120), nullable=False, unique=True)
+    username = db.Column(db.String(150), nullable=False, unique=True)
+    email = db.Column(db.String(150), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=True)
     transacciones = db.relationship('Transaccion', backref='dueno', lazy=True)
 
@@ -110,26 +110,23 @@ def google_login():
 @app.route('/authorize')
 def authorize():
     token = google.authorize_access_token()
-    # Pedimos los datos del usuario a Google
     resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo')
     user_info = resp.json()
     
-    # Datos que nos da Google
     email_google = user_info['email']
-    nombre_google = user_info['name'] 
+    nombre_google = user_info.get('name', email_google)
 
-    # Verificamos si ya existe en nuestra DB
     user = User.query.filter_by(email=email_google).first()
 
     if not user:
-        # Si NO existe, lo creamos automáticamente (sin contraseña)
-        # Usamos el email como username temporal o el nombre de Google
-        # Nota: Podrías tener conflictos si el nombre ya existe, para simplificar usaremos el email como username
-        user = User(username=email_google, email=email_google, password=None)
+        import secrets
+        password_dummy = secrets.token_hex(16) 
+        
+        user = User(username=email_google, email=email_google, password=password_dummy)
+        
         db.session.add(user)
         db.session.commit()
 
-    # Lo logueamos
     login_user(user)
     return redirect(url_for('home'))
 
