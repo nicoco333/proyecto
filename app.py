@@ -8,6 +8,7 @@ import csv
 from io import StringIO
 from flask import make_response
 import os
+from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
 
@@ -23,6 +24,18 @@ else:
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'clave_secreta_super_segura'
+app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
+app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
+
+oauth = OAuth(app)
+
+google = oauth.register(
+    name='google',
+    client_id=app.config['GOOGLE_CLIENT_ID'],
+    client_secret=app.config['GOOGLE_CLIENT_SECRET'],
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={'scope': 'openid email profile'}
+)
 
 # Inicializamos la base de datos
 db = SQLAlchemy(app)
@@ -36,8 +49,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
-    # Relación: Un usuario tiene muchas transacciones
+    password = db.Column(db.String(80), nullable=True)
     transacciones = db.relationship('Transaccion', backref='dueno', lazy=True)
 
 # --- MODELO DE TRANSACCIÓN (MODIFICADO) ---
@@ -87,6 +99,37 @@ def login():
         else:
             return render_template('login.html', error="Usuario o contraseña incorrectos")
     return render_template('login.html')
+
+@app.route('/login/google')
+def google_login():
+    redirect_uri = url_for('authorize', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/authorize')
+def authorize():
+    token = google.authorize_access_token()
+    # Pedimos los datos del usuario a Google
+    resp = google.get('https://www.googleapis.com/oauth2/v3/userinfo')
+    user_info = resp.json()
+    
+    # Datos que nos da Google
+    email_google = user_info['email']
+    nombre_google = user_info['name'] 
+
+    # Verificamos si ya existe en nuestra DB
+    user = User.query.filter_by(email=email_google).first()
+
+    if not user:
+        # Si NO existe, lo creamos automáticamente (sin contraseña)
+        # Usamos el email como username temporal o el nombre de Google
+        # Nota: Podrías tener conflictos si el nombre ya existe, para simplificar usaremos el email como username
+        user = User(username=email_google, email=email_google, password=None)
+        db.session.add(user)
+        db.session.commit()
+
+    # Lo logueamos
+    login_user(user)
+    return redirect(url_for('home'))
 
 @app.route('/logout')
 @login_required
