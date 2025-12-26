@@ -139,6 +139,8 @@ def logout():
 @app.route('/')
 @login_required
 def home():
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
     hoy = datetime.today()
     
     anio_seleccionado = request.args.get('anio', type=int, default=hoy.year)
@@ -152,18 +154,18 @@ def home():
      .order_by(desc('anio'), desc('mes'))\
      .all()
 
-    transacciones = Transaccion.query.filter(
-        Transaccion.user_id == current_user.id, 
+    transacciones_paginadas = Transaccion.query.filter(
+        Transaccion.user_id == current_user.id,
         extract('month', Transaccion.fecha) == mes_seleccionado,
         extract('year', Transaccion.fecha) == anio_seleccionado
-    ).order_by(Transaccion.fecha.desc()).all()
+    ).order_by(desc(Transaccion.fecha)).paginate(page=page, per_page=per_page)
 
-    total_ingresos = sum(t.monto for t in transacciones if t.tipo == 'ingreso')
-    total_gastos = sum(t.monto for t in transacciones if t.tipo == 'gasto')
+    total_ingresos = sum(t.monto for t in transacciones_paginadas if t.tipo == 'ingreso')
+    total_gastos = sum(t.monto for t in transacciones_paginadas if t.tipo == 'gasto')
     saldo = total_ingresos - total_gastos
 
     datos_gastos = {} 
-    for t in transacciones:
+    for t in transacciones_paginadas:
         if t.tipo == 'gasto':
             if t.categoria in datos_gastos:
                 datos_gastos[t.categoria] += t.monto
@@ -176,7 +178,7 @@ def home():
     nombres_meses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
     return render_template('index.html', 
-                           transacciones=transacciones, 
+                           transacciones=transacciones_paginadas,
                            ingresos=total_ingresos, 
                            gastos=total_gastos, 
                            saldo=saldo,
