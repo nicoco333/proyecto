@@ -192,91 +192,76 @@ select {
     gap: 10px;
 }
 
-/* --- BOTONES TOGGLE (SELECTOR GASTO/INGRESO) --- */
 .toggle-container {
     display: flex;
-    gap: 15px; /* Espacio entre los botones */
+    gap: 15px; 
     margin-bottom: 15px;
 }
 
-/* 1. Ocultamos el círculo feo por defecto */
 .toggle-container input[type="radio"] {
     display: none;
 }
 
-/* 2. Estilo base del botón (cuando está apagado) */
 .toggle-btn {
-    flex: 1; /* Que ocupen el mismo ancho */
+    flex: 1; 
     padding: 15px;
     text-align: center;
-    border: 2px solid #eee; /* Borde gris suave */
+    border: 2px solid #eee; 
     border-radius: 12px;
     cursor: pointer;
     font-weight: 600;
-    color: #bbb; /* Texto gris */
-    transition: all 0.3s ease; /* Animación suave */
+    color: #bbb; 
+    transition: all 0.3s ease; 
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* Espacio entre ícono y texto */
+    gap: 8px;
 }
 
 .toggle-btn:hover {
     background-color: #f9f9f9;
 }
 
-/* 3. Estilo cuando seleccionas GASTO (Rojo) */
-/* La lógica es: "Cuando el input 'tipo-gasto' esté checked, cambia su label hermano" */
 input#tipo-gasto:checked + .toggle-btn.gasto {
     border-color: #e74c3c;
     background-color: #fceceb;
     color: #e74c3c;
-    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2); /* Sombrita roja */
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2); 
 }
 
-/* 4. Estilo cuando seleccionas INGRESO (Verde) */
 input#tipo-ingreso:checked + .toggle-btn.ingreso {
     border-color: #2ecc71;
     background-color: #eafaf1;
     color: #2ecc71;
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2); /* Sombrita verde */
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2); 
 }
 
-
-/* --- ESTILOS RESPONSIVE (MÓVIL) --- */
-
-/* Por defecto (PC), escondemos los botones móviles */
 .menu-toggle, .close-btn {
     display: none;
 }
 
-/* Clase auxiliar para el botón de Excel en móvil */
 .btn-excel {
     background-color: #27ae60; color: white; padding: 10px 15px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 0.9rem; white-space: nowrap;
 }
 
-/* MEDIA QUERY: Reglas que solo aplican si la pantalla es menor a 768px (Tablets y Celulares) */
 @media (max-width: 768px) {
     
     body {
-        flex-direction: column; /* Ya no uno al lado del otro */
+        flex-direction: column; 
     }
-
-    /* 1. Configuración de la Barra Lateral Móvil */
     .sidebar {
-        position: fixed;       /* Flota sobre todo */
+        position: fixed;    
         top: 0;
-        left: -100%;           /* ESCONDIDA A LA IZQUIERDA */
+        left: -100%;          
         width: 250px;
-        height: 100vh;         /* Altura completa */
-        z-index: 1000;         /* Encima de todo */
+        height: 100vh;    
+        z-index: 1000;      
         background-color: #2c3e50;
-        transition: 0.3s ease; /* Animación suave */
+        transition: 0.3s ease; 
     }
 
-    /* Esta clase se agrega con JS para mostrar la barra */
     .sidebar.active {
-        left: 0;               /* VUELVE A LA PANTALLA */
+        left: 0;             
         box-shadow: 5px 0 15px rgba(0,0,0,0.5);
     }
 
@@ -285,16 +270,16 @@ input#tipo-ingreso:checked + .toggle-btn.ingreso {
         display: block;
         background: none;
         border: none;
-        font-size: 1.8rem; /* Un poco más grande para el dedo */
+        font-size: 1.8rem; 
         cursor: pointer;
         color: #333;
         margin-right: 15px;
-        position: relative; /* Importante */
-        z-index: 1001;      /* ¡ENCIMA DE TODO! */
+        position: relative; 
+        z-index: 1001;      
     }
 
     .close-btn {
-        display: block;        /* Mostramos la X */
+        display: block;       
         background: none;
         border: none;
         color: white;
@@ -307,25 +292,23 @@ input#tipo-ingreso:checked + .toggle-btn.ingreso {
 
     /* 3. Ajustes de contenido para que no se rompa */
     .main-content {
-        padding: 15px;         /* Menos relleno en celular */
+        padding: 15px;         
         width: 100%;
         box-sizing: border-box;
     }
 
-    /* Ajustar tarjetas para que se apilen */
     .dashboard {
         flex-direction: column;
     }
 
     .chart-container {
-        flex-direction: column; /* Gráfico arriba, texto abajo */
+        flex-direction: column; 
     }
 
-    /* Ocultar la palabra "Excel" y dejar solo el ícono para ahorrar espacio */
     .text-excel {
         display: none;
     }
     header {
-        flex-wrap: nowrap; /* Que no se rompa en dos líneas */
+        flex-wrap: nowrap; 
     }
 }
